@@ -1,6 +1,6 @@
 {
 	"alwaysActivate": true,
-	"name" : "example",
+	"name" : "OVRCamTrack",
 	"directory" : "",
 	"resourceOnly" : false,
 	"prefersUpperDeviceIndices" :  true,

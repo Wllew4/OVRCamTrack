@@ -25,7 +25,7 @@ endif()
 find_library(OPENVR_LIB openvr_api HINTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/openvr/lib/${PLATFORM_NAME}${PROCESSOR_ARCH}/" NO_DEFAULT_PATH )
 
 # Driver Project
-set(PROJECT_NAME "OVRCamTrack")
+set(PROJECT_NAME "driver_OVRCamTrack")
 file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_library("${PROJECT_NAME}" SHARED "${HEADERS}" "${SOURCES}")
@@ -41,7 +41,7 @@ add_custom_command(
     PRE_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory 
     ${CMAKE_SOURCE_DIR}/driver_files/
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/driver/
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/OVRCamTrack/
 )
 
 # Copy dll to output folder
@@ -50,5 +50,5 @@ add_custom_command(
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy 
     $<TARGET_FILE:${PROJECT_NAME}>
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/${DRIVER_NAME}/driver/bin/${PLATFORM_NAME}${PROCESSOR_ARCH}/$<TARGET_FILE_NAME:${PROJECT_NAME}>
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/${DRIVER_NAME}/OVRCamTrack/bin/${PLATFORM_NAME}${PROCESSOR_ARCH}/$<TARGET_FILE_NAME:${PROJECT_NAME}>
 )

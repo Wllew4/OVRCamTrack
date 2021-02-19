@@ -2,15 +2,15 @@
   "jsonid": "input_profile",
   "controller_type": "example_controller",
   "device_class": "TrackedDeviceClass_Controller",
-  "resource_root": "example",
-  "driver_name": "example",
+  "resource_root": "OVRCamTrack",
+  "driver_name": "OVRCamTrack",
   "input_bindingui_mode": "controller_handed",
   "should_show_binding_errors": true,
   "input_bindingui_left": {
-    "image": "{example}/icons/example_controller_left.svg"
+    "image": "{OVRCamTrack}/icons/example_controller_left.svg"
   },
   "input_bindingui_right": {
-    "image": "{example}/icons/example_controller_right.svg"
+    "image": "{OVRCamTrack}/icons/example_controller_right.svg"
   },
   "input_source": {
     "/pose/raw" : {

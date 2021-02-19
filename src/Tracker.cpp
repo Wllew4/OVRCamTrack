@@ -1,12 +1,25 @@
 #include "Tracker.h"
 #include "main.h"
+#include "ExternalDevice.h"
 
 OVRct::Tracker::Tracker(std::string serial): serial_(serial){}
 
 std::string OVRct::Tracker::GetSerial(){ return this->serial_; }
 
+
+vr::TrackedDevicePose_t poses[3] = {};
+OVRct::ExternalDevice HMD (0, "HMD");
+OVRct::ExternalDevice HandL(1, "HandL");
+OVRct::ExternalDevice HandR(2, "HandR");
+
 void OVRct::Tracker::Update(){
     if(this->device_index == vr::k_unTrackedDeviceIndexInvalid) return;
+
+    OVRct::GetDriver()->GetDriverHost()->GetRawTrackedDevicePoses(0, poses, 3);
+    HMD.UpdatePos(poses);
+    HandL.UpdatePos(poses);
+    HandR.UpdatePos(poses);
+
 
     auto events = GetDriver()->GetOpenVREvents();
     for(auto event : events){
@@ -26,6 +39,9 @@ void OVRct::Tracker::Update(){
     }
 
     auto pose = OVRDevice::MakeDefaultPose();
+    pose.vecPosition[0] = HandL.GetPos()[0];
+    pose.vecPosition[1] = HandL.GetPos()[1];
+    pose.vecPosition[2] = HandL.GetPos()[2];
 
     GetDriver()->GetDriverHost()->TrackedDevicePoseUpdated(this->device_index, pose, sizeof(vr::DriverPose_t));
     this->last_pose = pose;
@@ -36,7 +52,7 @@ vr::TrackedDeviceIndex_t OVRct::Tracker::GetDeviceIndex(){ return this->device_i
 vr::EVRInitError OVRct::Tracker::Activate(uint32_t unObjectId){
     this->device_index = unObjectId;
 
-    GetDriver()->Log("Activating tracker " + this->serial_);
+    GetDriver()->Log("Activating tracker hello " + this->serial_);
 
     auto props = GetDriver()->GetProperties()->TrackedDeviceToPropertyContainer(this->device_index);
 
@@ -58,18 +74,18 @@ vr::EVRInitError OVRct::Tracker::Activate(uint32_t unObjectId){
     GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_RenderModelName_String, "vr_controller_05_wireless_b");
 
     // Set controller profile
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_InputProfilePath_String, "{example}/input/example_tracker_bindings.json");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_InputProfilePath_String, "{OVRCamTrack}/input/example_tracker_bindings.json");
 
     // Set the icon
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceReady_String, "{example}/icons/tracker_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceReady_String, "{OVRCamTrack}/icons/tracker_ready.png");
 
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceOff_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceSearching_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceSearchingAlert_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceReadyAlert_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceNotReady_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceStandby_String, "{example}/icons/tracker_not_ready.png");
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceAlertLow_String, "{example}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceOff_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceSearching_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceSearchingAlert_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceReadyAlert_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceNotReady_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceStandby_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceAlertLow_String, "{OVRCamTrack}/icons/tracker_not_ready.png");
 
     return vr::EVRInitError::VRInitError_None;
 }

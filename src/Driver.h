@@ -33,6 +33,7 @@ namespace OVRct {
             virtual void EnterStandby() override;
             virtual void LeaveStandby() override;
 
+
             virtual ~OVRDriver() = default;
 
         private:
