@@ -1,24 +1,19 @@
 #include "Tracker.h"
 #include "main.h"
-#include "ExternalDevice.h"
 
 OVRct::Tracker::Tracker(std::string serial): serial_(serial){}
 
+void OVRct::Tracker::SetPos(float pos[3])
+{
+    m_Pos[0] = pos[0];
+    m_Pos[1] = pos[1];
+    m_Pos[2] = pos[2];
+}
+
 std::string OVRct::Tracker::GetSerial(){ return this->serial_; }
-
-
-vr::TrackedDevicePose_t poses[3] = {};
-OVRct::ExternalDevice HMD (0, "HMD");
-OVRct::ExternalDevice HandL(1, "HandL");
-OVRct::ExternalDevice HandR(2, "HandR");
 
 void OVRct::Tracker::Update(){
     if(this->device_index == vr::k_unTrackedDeviceIndexInvalid) return;
-
-    OVRct::GetDriver()->GetDriverHost()->GetRawTrackedDevicePoses(0, poses, 3);
-    HMD.UpdatePos(poses);
-    HandL.UpdatePos(poses);
-    HandR.UpdatePos(poses);
 
 
     auto events = GetDriver()->GetOpenVREvents();
@@ -38,10 +33,10 @@ void OVRct::Tracker::Update(){
         }
     }
 
-    auto pose = OVRDevice::MakeDefaultPose();
-    pose.vecPosition[0] = HandL.GetPos()[0];
-    pose.vecPosition[1] = HandL.GetPos()[1];
-    pose.vecPosition[2] = HandL.GetPos()[2];
+    auto pose = MakeDefaultPose();
+    pose.vecPosition[0] = m_Pos[0];
+    pose.vecPosition[1] = m_Pos[1];
+    pose.vecPosition[2] = m_Pos[2];
 
     GetDriver()->GetDriverHost()->TrackedDevicePoseUpdated(this->device_index, pose, sizeof(vr::DriverPose_t));
     this->last_pose = pose;

@@ -1,5 +1,5 @@
 #include "Driver.h"
-#include "Tracker.h"
+#include "main.h"
 
 vr::EVRInitError OVRct::OVRDriver::Init(vr::IVRDriverContext* pDriverContext){
     //initialize
@@ -12,6 +12,9 @@ vr::EVRInitError OVRct::OVRDriver::Init(vr::IVRDriverContext* pDriverContext){
 
     //add devices
     this->AddDevice(std::make_shared<Tracker>("Tracker1"));
+    external_devices.push_back(std::make_shared<ExternalDevice>(0, "HMD"));
+    external_devices.push_back(std::make_shared<ExternalDevice>(1, "HandL"));
+    external_devices.push_back(std::make_shared<ExternalDevice>(2, "HandR"));
 
     Log("Driver Loaded Suceessfully");
 
@@ -32,7 +35,13 @@ void OVRct::OVRDriver::RunFrame(){
     this->frame_timing = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->last_frame_time);
     this->last_frame_time = now;
 
+    OVRct::GetDriver()->GetDriverHost()->GetRawTrackedDevicePoses(0, poses, 3);
+    for (auto& eDevice : this->external_devices) {
+        eDevice->UpdatePos(poses);
+    }
+
     for(auto &device : this->devices){
+        device->SetPos(external_devices[1].get()->GetPos());
         device->Update();
     }
 }
@@ -45,7 +54,7 @@ void OVRct::OVRDriver::EnterStandby(){}
 
 void OVRct::OVRDriver::LeaveStandby(){}
 
-std::vector<std::shared_ptr<OVRct::OVRDevice>> OVRct::OVRDriver::GetDevices(){
+std::vector<std::shared_ptr<OVRct::Tracker>> OVRct::OVRDriver::GetDevices(){
     return this->devices;
 }
 
@@ -59,7 +68,7 @@ std::chrono::milliseconds OVRct::OVRDriver::GetLastFrameTime(){
 
 
 //  Incomplete
-bool OVRct::OVRDriver::AddDevice(std::shared_ptr<OVRDevice> device){
+bool OVRct::OVRDriver::AddDevice(std::shared_ptr<OVRct::Tracker> device){
     
     bool result = vr::VRServerDriverHost()->TrackedDeviceAdded(
         device->GetSerial().c_str(),

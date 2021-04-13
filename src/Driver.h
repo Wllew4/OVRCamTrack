@@ -5,17 +5,18 @@
 #include <chrono>
 #include <variant>
 
-#include "Device.h"
+#include "Tracker.h"
+#include "ExternalDevice.h"
 
 namespace OVRct {
 
     class OVRDriver : protected vr::IServerTrackedDeviceProvider {
         public:
             //Custom
-            std::vector<std::shared_ptr<OVRDevice>> GetDevices();
+            std::vector<std::shared_ptr<Tracker>> GetDevices();
             std::vector<vr::VREvent_t> GetOpenVREvents();
             std::chrono::milliseconds GetLastFrameTime();
-            bool AddDevice(std::shared_ptr<OVRDevice> device);
+            bool AddDevice(std::shared_ptr<Tracker> device);
             //Settings Key requires C++17
             vr::IVRDriverInput* GetInput();
             vr::CVRPropertyHelpers* GetProperties();
@@ -37,7 +38,11 @@ namespace OVRct {
             virtual ~OVRDriver() = default;
 
         private:
-            std::vector<std::shared_ptr<OVRDevice>> devices;
+            std::vector<std::shared_ptr<ExternalDevice>> external_devices;
+            vr::TrackedDevicePose_t poses[3] = {};
+
+            std::vector<std::shared_ptr<OVRct::Tracker>> devices;
+            
             std::vector<vr::VREvent_t> openvr_events;
             std::chrono::milliseconds frame_timing = std::chrono::milliseconds(16);
             std::chrono::system_clock::time_point last_frame_time = std::chrono::system_clock::now();
